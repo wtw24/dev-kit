@@ -96,14 +96,15 @@ After the initial setup, you will use these shorter commands for day-to-day work
 
 This project uses a `Makefile` to provide shortcuts. Run `make help` for a complete list. Here are the most common commands:
 
-| Command             | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| `make init`         | **Full reset:** Re-initializes and restarts the entire environment.         |
-| `make up`           | Starts all services without rebuilding.                                     |
-| `make down`         | Stops all services.                                                         |
-| `make restart`      | Restarts all services.                                                      |
-| `make generate-certs`| (Linux/macOS only) Generates or regenerates TLS certificates.               |
-| `make info`         | Displays useful project URLs.                                               |
+| Command                  | Description                                                         |
+|--------------------------|---------------------------------------------------------------------|
+| `make init`              | **Full reset:** Re-initializes and restarts the entire environment. |
+| `make up`                | Starts all services without rebuilding.                             |
+| `make down`              | Stops all services.                                                 |
+| `make docker-down-clear` | **DANGER:** Stops services and **deletes all data** (volumes).      |
+| `make restart`           | Restarts all services.                                              |
+| `make generate-certs`    | (Linux/macOS only) Generates or regenerates TLS certificates.       |
+| `make info`              | Displays useful project URLs.                                       |
 
 ---
 
