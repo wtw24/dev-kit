@@ -101,6 +101,8 @@ success:
 info: ## Displays useful project URLs.
 	@echo "\nDev-Kit Services URLs:"
 	@echo " - Traefik: \t\t https://traefik.app.loc"
+	@echo " - Buggregator: \t https://buggregator.app.loc"
+	@echo " "
 
 
 help: ## Displays this help message.

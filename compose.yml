@@ -2,7 +2,7 @@ name: "dev-kit"
 
 services:
   traefik:
-    image: "traefik:v2.10"
+    image: "traefik:3.4"
     container_name: "dk-traefik"
     security_opt:
       - "no-new-privileges:true"
@@ -24,6 +24,24 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`traefik.app.loc`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
+
+  buggregator:
+    image: "ghcr.io/buggregator/server:1.13"
+    container_name: "dk-buggregator"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1025:1025" # SMTP
+      - "127.0.0.1:9912:9912" # Var-Dumper
+      - "127.0.0.1:9913:9913" # Monolog
+    networks:
+      - "proxy"
+      - "dev"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.buggregator.rule=Host(`${BUGGREGATOR_URL:-buggregator.app.loc}`)"
+      - "traefik.http.services.buggregator.loadbalancer.server.port=8000"
+      - "traefik.http.routers.buggregator.tls=true"
 
 networks:
   proxy:

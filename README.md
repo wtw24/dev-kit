@@ -37,6 +37,7 @@ For your browser to access local domains like `traefik.app.loc`, you must tell y
 **Add the following line to your hosts file:**
 ```
 127.0.0.1 traefik.app.loc
+127.0.0.1 buggregator.app.loc
 ```
 *(Note: As you add new projects, you will need to add their subdomains here as well, e.g., `my-project.app.loc`)*
 
@@ -110,5 +111,12 @@ This project uses a `Makefile` to provide shortcuts. Run `make help` for a compl
 Key services can be accessed via the following URLs (after completing the setup):
 
 -   **Traefik Dashboard:** `https://traefik.app.loc`
+-   **Buggregator:** `https://buggregator.app.loc`
 
 Run `make info` at any time to see a list of important URLs.
+
+
+## Used Images
+
+- https://hub.docker.com/_/traefik
+- https://github.com/buggregator/server/pkgs/container/server
