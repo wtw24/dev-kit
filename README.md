@@ -112,6 +112,7 @@ Key services can be accessed via the following URLs (after completing the setup)
 
 -   **Traefik Dashboard:** `https://traefik.app.loc`
 -   **Buggregator:** `https://buggregator.app.loc`
+-   **Dozzle:** `https://logs.app.loc`
 
 Run `make info` at any time to see a list of important URLs.
 
@@ -120,3 +121,4 @@ Run `make info` at any time to see a list of important URLs.
 
 - https://hub.docker.com/_/traefik
 - https://github.com/buggregator/server/pkgs/container/server
+- https://hub.docker.com/r/amir20/dozzle

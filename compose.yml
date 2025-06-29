@@ -26,7 +26,7 @@ services:
       - "traefik.http.routers.dashboard.tls=true"
 
   buggregator:
-    image: "ghcr.io/buggregator/server:1.13"
+    image: "ghcr.io/buggregator/server:latest"
     container_name: "dk-buggregator"
     restart: unless-stopped
     ports:
@@ -42,6 +42,20 @@ services:
       - "traefik.http.routers.buggregator.rule=Host(`${BUGGREGATOR_URL:-buggregator.app.loc}`)"
       - "traefik.http.services.buggregator.loadbalancer.server.port=8000"
       - "traefik.http.routers.buggregator.tls=true"
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: "dt-dozzle"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - "proxy"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.dozzle.rule=Host(`${DOZZLE_URL:-logs.app.loc}`)"
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dozzle.tls=true"
 
 networks:
   proxy:
