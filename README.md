@@ -6,30 +6,34 @@ This repository contains the core infrastructure stack for local development, ba
 
 Before you begin, ensure you have the following tools installed on your **host machine**.
 
-### 1. Docker and Docker Compose
-This stack relies on Docker to manage all services. Docker Compose is used to orchestrate the containers.
+### 1. Docker Engine with the Compose command
+This stack is managed using the modern `docker compose` command (note the space, not a hyphen).
 
--   **macOS & Windows:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/). It includes both Docker and Docker Compose.
--   **Linux:** Follow the official instructions to install the [Docker Engine](https://docs.docker.com/engine/install/) and the [Docker Compose plugin](https://docs.docker.com/compose/install/).
+-   **macOS & Windows:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/). It includes everything you need: the Docker Engine and the `docker compose` command are available out-of-the-box.
+
+-   **Linux:** Follow the official installation guide for your specific distribution on the Docker website. The recommended installation method now bundles all necessary packages, including the `compose` plugin, into a single command.
+    -   **[Find your distribution's guide here: Docker Engine installation guide](https://docs.docker.com/engine/install/)**
+
+    When you follow the official steps, the final installation command will install `docker-ce`, `docker-ce-cli`, `containerd.io`, and `docker-compose-plugin` all at once, ensuring you have the complete, up-to-date toolset.
 
 ### 2. Make
 A `Makefile` is used to simplify common commands.
 
 -   **macOS:** `make` is pre-installed with Xcode Command Line Tools. Run `xcode-select --install` if you don't have it.
--   **Linux:** Install it via your package manager (e.g., `sudo apt-get install make` or `sudo dnf install make`).
--   **Windows:** You can use `make` from within WSL.
+-   **Linux:** Install it via your package manager (e.g., `sudo apt-get install make`).
+-   **Windows:** The recommended approach is to use `make` from within your WSL distribution.
 
 ### 3. mkcert
-`mkcert` is used to create locally-trusted TLS certificates for running HTTPS on your local domains.
+`mkcert` is used to create locally-trusted TLS certificates for running HTTPS on local domains.
 
-**Crucial for Windows/WSL users:** `mkcert` must be installed and run **on the machine where your browser is running** (i.e., your Windows host, not inside the WSL environment).
+**Crucial for Windows/WSL users:** `mkcert` must be installed and run **on your Windows host**, not inside the WSL environment, so that your browser trusts the certificates.
 
 -   **macOS:** `brew install mkcert`
 -   **Linux:** Follow the [official mkcert installation instructions](https://github.com/FiloSottile/mkcert#installation).
 -   **Windows:** Use a package manager like Chocolatey (`choco install mkcert`) or Scoop (`scoop install mkcert`).
 
-#### One-Time Trust Setup (All Operating Systems)
-After installing `mkcert`, you must run the following command **once per machine** to install the local Certificate Authority (CA). This makes your system and browsers trust the certificates you generate.
+#### One-Time Trust Setup
+After installing `mkcert`, you must run the following command **once per machine** to install its local Certificate Authority (CA). This makes your system and browsers trust the certificates you generate.
 
 ```bash
 # On macOS or Linux (in Terminal)
@@ -40,34 +44,95 @@ mkcert -install
 ```
 You may be prompted for your password or a security confirmation. This is expected.
 
-## Usage
+---
 
-Follow these steps to get the development environment up and running.
+## Getting Started: First-Time Setup
 
-### Step 1: Generate TLS Certificates
-First, you need to generate the SSL certificates for your local domain (`app.loc`).
+Follow these steps to perform the initial setup of the environment.
+
+### Step 1: Clone the Repository
+If you haven't already, clone this repository to your local machine:
+```bash
+git clone <your-repository-url>
+cd dev-kit
+```
+
+### Step 2: Generate TLS Certificates
+This step needs to be done once per project.
 
 -   **On macOS & Linux:**
-    Run the following command. It will create the certificates only if they don't already exist.
+    Run the following `make` command:
     ```bash
     make generate-certs
     ```
 
 -   **On Windows:**
-    You must perform this step manually from **PowerShell** or **CMD** in the project's root directory.
+    You must run this command manually from **PowerShell** or **CMD** in the project's root directory:
     ```powershell
-    # Ensure you are in the project's root directory
     mkcert -cert-file docker/traefik/certs/local-cert.pem -key-file docker/traefik/certs/local-key.pem "app.loc" "*.app.loc"
     ```
 
-### Step 2: Initialize the Environment
-This command creates the necessary Docker networks and your local `.env` file from the `env.example` template.
+### Step 3: Initialize and Start the Environment
+Now, run the main `init` command. This is a comprehensive script that will:
+-   Create your local `.env` file from the example.
+-   Ensure Docker networks are present.
+-   Pull the latest versions of all Docker images.
+-   Build the images.
+-   Start all services in the background.
 
 ```bash
 make init
 ```
-After running this, you can review and customize the variables in the newly created `.env` file.
+This command might take a few minutes on the first run. Once it's done, your entire development stack is up and running.
 
-## Available Commands
+---
 
-This project uses a `Makefile` to provide shortcuts for common operations. Run `make help` to see a full list of available commands and their descriptions.
+## Daily Workflow
+
+After the initial setup, you will use these shorter commands for day-to-day work:
+
+-   To **start** all services:
+    ```bash
+    make up
+    ```
+
+-   To **stop** all services:
+    ```bash
+    make down
+    ```
+
+-   To **restart** all services:
+    ```bash
+    make restart
+    ```
+
+---
+
+## Command Reference
+
+Here is a summary of the most useful commands. For a complete list, run `make help`.
+
+| Command             | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| **Workflow**        |                                                                             |
+| `make init`         | **Full reset:** Re-initializes and restarts the entire environment.         |
+| `make up`           | Starts all services without rebuilding.                                     |
+| `make down`         | Stops all services.                                                         |
+| `make restart`      | Restarts all services.                                                      |
+| **Maintenance**     |                                                                             |
+| `make pull`         | Pulls the latest versions of all Docker images.                             |
+| `make build`        | Forces a rebuild of all services.                                           |
+| `make generate-certs`| (Linux/macOS only) Generates or regenerates TLS certificates.               |
+| `make docker-down-clear` | **DANGER:** Stops services and **deletes all data** (volumes).          |
+| **Information**     |                                                                             |
+| `make info`         | Displays useful project URLs.                                               |
+| `make help`         | Displays the full list of available commands.                               |
+
+
+## Accessing Services
+
+Key services can be accessed via the following URLs:
+
+-   **Traefik Dashboard:** `https://traefik.app.loc`
+
+You can run `make info` at any time to see a list of important URLs.
