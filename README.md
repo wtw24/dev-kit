@@ -110,9 +110,9 @@ This project uses a `Makefile` to provide shortcuts. Run `make help` for a compl
 
 Key services can be accessed via the following URLs (after completing the setup):
 
--   **Traefik Dashboard:** `https://traefik.app.loc`
--   **Buggregator:** `https://buggregator.app.loc`
--   **Dozzle:** `https://logs.app.loc`
+-   **Traefik Dashboard:** https://traefik.app.loc
+-   **Buggregator:** https://buggregator.app.loc
+-   **Dozzle:** https://logs.app.loc
 
 Run `make info` at any time to see a list of important URLs.
 
