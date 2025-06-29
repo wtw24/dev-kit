@@ -4,9 +4,7 @@
 UID=$(shell id -u)
 GID=$(shell id -g)
 
-CERT_DIR := docker/traefik/certs
-CERT_FILE := $(CERT_DIR)/local-cert.pem
-KEY_FILE := $(CERT_DIR)/local-key.pem
+CERT_FILE := docker/traefik/certs/local-cert.pem
 
 # --- Colors ---
 COLOR_GREEN=\033[1;32m
@@ -18,7 +16,7 @@ COLOR_DEFAULT=\033[0m
 # --- Main Commands ---
 init: pre-scripts post-scripts ## Initializes the project environment (creates .env file)
 
-pre-scripts: create-env-file create-networks certs
+pre-scripts: create-env-file create-networks
 post-scripts: success
 
 # --- Internal Steps ---
@@ -32,13 +30,24 @@ create-networks:
 	@docker network create proxy 2>/dev/null || true
 
 $(CERT_FILE):
-	@echo "-> Certificates not found. Generating new ones..."
+	@echo "$(R)--> ERROR: Certificate file not found at [$(CERT_FILE)]$(EC)"
+	@echo "$(Y)If you are on macOS/Linux, run 'make generate-certs' to create them.$(EC)"
+	@echo "$(Y)If you are on Windows/WSL, please follow the setup instructions in README.md to generate certs from PowerShell/CMD.$(EC)"
+	@exit 1
+
+check-certs: $(CERT_FILE) ## Checks if TLS certificates exist.
+	@echo "-> Certificates are in place."
+
+generate-certs: ## (Linux/macOS only) Generates or regenerates TLS certificates.
+	@if [ -f "$(CERT_FILE)" ]; then \
+    		echo "$(COLOR_YELLOW)-> Regenerating existing certificates...$(COLOR_DEFAULT)"; \
+    	else \
+    		echo "$(COLOR_YELLOW)-> Generating new certificates...$(COLOR_DEFAULT)"; \
+    	fi
 	@echo "   IMPORTANT: Make sure you have run 'mkcert -install' once on your machine."
 	@mkdir -p $(CERT_DIR)
 	@mkcert -cert-file $(CERT_FILE) -key-file $(KEY_FILE) "app.loc" "*.app.loc"
-
-certs: $(CERT_FILE) ## Generates local TLS certificates if they don't exist.
-	@echo "-> Certificates are up to date."
+	@echo "$(COLOR_GREEN)✓ Certificates successfully created/updated.$(COLOR_DEFAULT)"
 
 success:
 	@echo "\n$(COLOR_GREEN)✓ Environment has been successfully initialized.$(COLOR_DEFAULT)"
