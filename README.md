@@ -38,6 +38,7 @@ For your browser to access local domains like `traefik.app.loc`, you must tell y
 ```
 127.0.0.1 traefik.app.loc
 127.0.0.1 buggregator.app.loc
+127.0.0.1 logs.app.loc
 ```
 *(Note: As you add new projects, you will need to add their subdomains here as well, e.g., `my-project.app.loc`)*
 
