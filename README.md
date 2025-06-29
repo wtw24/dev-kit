@@ -1,4 +1,4 @@
-# dev-kit
+# Dev-Kit
 
 This repository contains the core infrastructure stack for local development, based on Docker and Traefik. It provides shared services like databases, caching, and a reverse proxy for all your projects.
 
@@ -7,42 +7,23 @@ This repository contains the core infrastructure stack for local development, ba
 Before you begin, ensure you have the following tools installed on your **host machine**.
 
 ### 1. Docker Engine with the Compose command
-This stack is managed using the modern `docker compose` command (note the space, not a hyphen).
+This stack is managed using the modern `docker compose` command.
 
--   **macOS & Windows:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/). It includes everything you need: the Docker Engine and the `docker compose` command are available out-of-the-box.
-
--   **Linux:** Follow the official installation guide for your specific distribution on the Docker website. The recommended installation method now bundles all necessary packages, including the `compose` plugin, into a single command.
-    -   **[Find your distribution's guide here: Docker Engine installation guide](https://docs.docker.com/engine/install/)**
-
-    When you follow the official steps, the final installation command will install `docker-ce`, `docker-ce-cli`, `containerd.io`, and `docker-compose-plugin` all at once, ensuring you have the complete, up-to-date toolset.
+-   **macOS & Windows:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/). It includes everything you need.
+-   **Linux:** Follow the official [Docker Engine installation guide](https://docs.docker.com/engine/install/) for your distribution. The recommended method now bundles all necessary packages, including the `compose` plugin.
 
 ### 2. Make
 A `Makefile` is used to simplify common commands.
 
--   **macOS:** `make` is pre-installed with Xcode Command Line Tools. Run `xcode-select --install` if you don't have it.
--   **Linux:** Install it via your package manager (e.g., `sudo apt-get install make`).
--   **Windows:** The recommended approach is to use `make` from within your WSL distribution.
+-   **macOS:** Pre-installed with Xcode Command Line Tools (`xcode-select --install`).
+-   **Linux:** Install via your package manager (e.g., `sudo apt-get install make`).
+-   **Windows:** Use `make` from within your WSL distribution.
 
 ### 3. mkcert
-`mkcert` is used to create locally-trusted TLS certificates for running HTTPS on local domains.
+`mkcert` is used to create locally-trusted TLS certificates.
 
-**Crucial for Windows/WSL users:** `mkcert` must be installed and run **on your Windows host**, not inside the WSL environment, so that your browser trusts the certificates.
-
--   **macOS:** `brew install mkcert`
--   **Linux:** Follow the [official mkcert installation instructions](https://github.com/FiloSottile/mkcert#installation).
--   **Windows:** Use a package manager like Chocolatey (`choco install mkcert`) or Scoop (`scoop install mkcert`).
-
-#### One-Time Trust Setup
-After installing `mkcert`, you must run the following command **once per machine** to install its local Certificate Authority (CA). This makes your system and browsers trust the certificates you generate.
-
-```bash
-# On macOS or Linux (in Terminal)
-mkcert -install
-
-# On Windows (in PowerShell as Administrator)
-mkcert -install
-```
-You may be prompted for your password or a security confirmation. This is expected.
+-   **Installation:** Follow the installation guide for your OS on the [official mkcert page](https://github.com/FiloSottile/mkcert#installation).
+-   **One-Time Trust Setup:** After installing, run `mkcert -install` **once per machine** to make your system trust the certificates. On Windows, this must be done in PowerShell (as Administrator).
 
 ---
 
@@ -50,12 +31,29 @@ You may be prompted for your password or a security confirmation. This is expect
 
 Follow these steps to perform the initial setup of the environment.
 
-### Step 1: Clone the Repository
-If you haven't already, clone this repository to your local machine:
-```bash
-git clone <your-repository-url>
-cd dev-kit
+### Step 1: Configure Your Hosts File
+For your browser to access local domains like `traefik.app.loc`, you must tell your operating system to resolve them to your local machine (`127.0.0.1`). This requires editing the `hosts` file with administrator privileges.
+
+**Add the following line to your hosts file:**
 ```
+127.0.0.1 traefik.app.loc
+```
+*(Note: As you add new projects, you will need to add their subdomains here as well, e.g., `my-project.app.loc`)*
+
+-   **On macOS & Linux:**
+    1.  Open a terminal.
+    2.  Run `sudo nano /etc/hosts`.
+    3.  Enter your password.
+    4.  Add the line, then save the file by pressing `Ctrl+X`, then `Y`, then `Enter`.
+
+-   **On Windows:**
+    1.  Press the Windows key, type "Notepad".
+    2.  Right-click on the Notepad icon and select **"Run as administrator"**.
+    3.  In Notepad, go to `File > Open`.
+    4.  Navigate to `C:\Windows\System32\drivers\etc`.
+    5.  Change the file type filter in the bottom-right from "Text Documents (*.txt)" to **"All Files (*.*)"**.
+    6.  Select the `hosts` file and click "Open".
+    7.  Add the line at the end of the file and save.
 
 ### Step 2: Generate TLS Certificates
 This step needs to be done once per project.
@@ -73,12 +71,7 @@ This step needs to be done once per project.
     ```
 
 ### Step 3: Initialize and Start the Environment
-Now, run the main `init` command. This is a comprehensive script that will:
--   Create your local `.env` file from the example.
--   Ensure Docker networks are present.
--   Pull the latest versions of all Docker images.
--   Build the images.
--   Start all services in the background.
+Now, run the main `init` command. This will prepare and start the entire stack.
 
 ```bash
 make init
@@ -91,48 +84,31 @@ This command might take a few minutes on the first run. Once it's done, your ent
 
 After the initial setup, you will use these shorter commands for day-to-day work:
 
--   To **start** all services:
-    ```bash
-    make up
-    ```
-
--   To **stop** all services:
-    ```bash
-    make down
-    ```
-
--   To **restart** all services:
-    ```bash
-    make restart
-    ```
+-   To **start** all services: `make up`
+-   To **stop** all services: `make down`
+-   To **restart** all services: `make restart`
 
 ---
 
 ## Command Reference
 
-Here is a summary of the most useful commands. For a complete list, run `make help`.
+This project uses a `Makefile` to provide shortcuts. Run `make help` for a complete list. Here are the most common commands:
 
 | Command             | Description                                                                 |
 | ------------------- | --------------------------------------------------------------------------- |
-| **Workflow**        |                                                                             |
 | `make init`         | **Full reset:** Re-initializes and restarts the entire environment.         |
 | `make up`           | Starts all services without rebuilding.                                     |
 | `make down`         | Stops all services.                                                         |
 | `make restart`      | Restarts all services.                                                      |
-| **Maintenance**     |                                                                             |
-| `make pull`         | Pulls the latest versions of all Docker images.                             |
-| `make build`        | Forces a rebuild of all services.                                           |
 | `make generate-certs`| (Linux/macOS only) Generates or regenerates TLS certificates.               |
-| `make docker-down-clear` | **DANGER:** Stops services and **deletes all data** (volumes).          |
-| **Information**     |                                                                             |
 | `make info`         | Displays useful project URLs.                                               |
-| `make help`         | Displays the full list of available commands.                               |
 
+---
 
 ## Accessing Services
 
-Key services can be accessed via the following URLs:
+Key services can be accessed via the following URLs (after completing the setup):
 
 -   **Traefik Dashboard:** `https://traefik.app.loc`
 
-You can run `make info` at any time to see a list of important URLs.
+Run `make info` at any time to see a list of important URLs.
