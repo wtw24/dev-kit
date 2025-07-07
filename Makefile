@@ -39,7 +39,7 @@ docker-down-clear: ## DANGER: Stops and removes all volumes (deletes all data).
 	@read -p "Type 'YES' in all caps to confirm: " CONFIRM; \
 	if [ "$$CONFIRM" = "YES" ]; then \
 		@printf "\nConfirmation received. Proceeding with data deletion...\n"; \
-		docker compose down -v --remove-orphans; \
+		@docker compose down -v --remove-orphans; \
 		@printf "✓%b All services and associated volumes have been successfully removed.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"; \
 	else \
 		@printf "\nConfirmation not received. Operation cancelled.\n"; \
