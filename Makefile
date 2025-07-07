@@ -34,23 +34,16 @@ restart: down up ## Restarts the environment.
 # ====================================================================================
 
 docker-down-clear: ## DANGER: Stops and removes all volumes (deletes all data).
-	@echo ""
-	@echo "$(COLOR_RED)🔥 WARNING: You are about to permanently delete ALL Docker volumes for this project.$(COLOR_DEFAULT)"
-	@echo "$(COLOR_RED)   This includes all databases, cached data, etc. This action CANNOT be undone.$(COLOR_DEFAULT)"
-	@echo ""
+	@printf "\n%b   WARNING: You are about to permanently delete ALL Docker volumes for this project.%b\n" "$(COLOR_RED)" "$(COLOR_DEFAULT)"
+	@printf "%b   This includes all databases, cached data, etc. This action CANNOT be undone.%b\n\n" "$(COLOR_RED)" "$(COLOR_DEFAULT)"
 	@read -p "Type 'YES' in all caps to confirm: " CONFIRM; \
 	if [ "$$CONFIRM" = "YES" ]; then \
-		echo ""; \
-		echo "Confirmation received. Proceeding with data deletion..."; \
+		@printf "\nConfirmation received. Proceeding with data deletion...\n"; \
 		docker compose down -v --remove-orphans; \
-		echo "$(COLOR_GREEN)✓ All services and associated volumes have been successfully removed.$(COLOR_DEFAULT)"; \
+		@printf "✓%b All services and associated volumes have been successfully removed.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"; \
 	else \
-		echo ""; \
-		echo "Confirmation not received. Operation cancelled."; \
+		@printf "\nConfirmation not received. Operation cancelled.\n"; \
 	fi
-
-pull: docker-pull ## Pulls the latest versions of all Docker images.
-build: docker-build ## Forces a rebuild of all Docker images.
 
 # ====================================================================================
 #  Internal Steps & Scripts
@@ -62,65 +55,63 @@ post-scripts: success info
 
 # -- Docker Wrappers --
 docker-up:
-	@echo "✓ Starting containers..."
+	@printf "✓ Starting containers...\n"
 	@docker compose up -d
 
 docker-down:
-	@echo "✓ Stopping containers..."
+	@printf "✓ Stopping containers...\n"
 	@docker compose down --remove-orphans
 
 docker-pull:
-	@echo "✓ Pulling latest images..."
+	@printf "✓ Pulling latest images...\n"
 	@docker compose pull
 
 docker-build:
-	@echo "✓ Building services..."
+	@printf "✓ Building services...\n"
 	@docker compose build --pull
 
 # -- Setup Scripts --
 create-env-file:
-	@echo "✓ Ensuring .env file exists..."
+	@printf "✓ Ensuring .env file exists...\n"
 	@docker run --rm -it -v ${PWD}:/app -w /app -u ${UID}:${GID} bash:5.2 bash docker/bin/create-env-file.sh
 
 create-networks:
-	@echo "✓ Ensuring Docker networks exist..."
+	@printf "✓ Ensuring Docker networks exist...\n"
 	@docker network create proxy 2>/dev/null || true
 	@docker network create dev 2>/dev/null || true
 
 check-certs: $(CERT_FILE)
-	@echo "✓ Certificates are in place."
+	@printf "✓ Certificates are in place.\n"
 
 $(CERT_FILE):
-	@echo "$(COLOR_RED)-✓ ERROR: Certificate file not found at [$(CERT_FILE)]$(COLOR_DEFAULT)"
-	@echo "$(COLOR_YELLOW)If on macOS/Linux, run 'make generate-certs' to create them.$(COLOR_DEFAULT)"
-	@echo "$(COLOR_YELLOW)If on Windows/WSL, follow README.md to generate certs from PowerShell.$(COLOR_DEFAULT)"
+	@printf "-%b ERROR: Certificate file not found at [%s]%b\n" "$(COLOR_RED)" "$(CERT_FILE)" "$(COLOR_DEFAULT)"
+	@printf "%bIf on macOS/Linux, run 'make generate-certs' to create them.%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"
+	@printf "%bIf on Windows/WSL, follow README.md to generate certs from PowerShell.%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"
 	@exit 1
 
 generate-certs: ## (Linux/macOS only) Generates or regenerates TLS certificates.
 	@if [ -f "$(CERT_FILE)" ]; then \
-    		echo "$(COLOR_YELLOW)✓ Regenerating existing certificates...$(COLOR_DEFAULT)"; \
-    	else \
-    		echo "$(COLOR_YELLOW)✓ Generating new certificates...$(COLOR_DEFAULT)"; \
-    	fi
-	@echo "   IMPORTANT: Make sure you have run 'mkcert -install' once on your machine."
+		@printf "✓%b Regenerating existing certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
+	else \
+		@printf "✓%b Generating new certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
+	fi
+	@printf "   IMPORTANT: Make sure you have run 'mkcert -install' once on your machine.\n"
 	@mkdir -p $(CERT_DIR)
 	@mkcert -cert-file $(CERT_FILE) -key-file $(KEY_FILE) "app.loc" "*.app.loc"
-	@echo "$(COLOR_GREEN)✓ Certificates successfully created/updated.$(COLOR_DEFAULT)"
+	@printf "%b✓ Certificates successfully created/updated.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"
 
 # -- Finalization --
 success:
-	@echo "\n$(COLOR_GREEN)✓ Environment is up and running.$(COLOR_DEFAULT)"
+	@printf "\n✓%b Environment is up and running.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)\n"
 
 info: ## Displays useful project URLs.
-	@echo "\nAccessing Services:"
-	@echo " - Traefik: \t\t https://traefik.app.loc"
-	@echo " - Buggregator: \t https://buggregator.app.loc"
-	@echo " - Dozzle: \t\t https://logs.app.loc"
-	@echo " "
+	@printf "\n%bAccessing Services:%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"
+	@printf " - Traefik:      https://traefik.app.loc\n"
+	@printf " - Buggregator:  https://buggregator.app.loc\n"
+	@printf " - Dozzle:       https://logs.app.loc\n\n"
 
 
 help: ## Displays this help message.
-	@echo "Usage: make [target]"
-	@echo ""
-	@echo "Available targets:"
+	@printf "Usage: make [target]\n\n"
+	@printf "Available targets:\n"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
