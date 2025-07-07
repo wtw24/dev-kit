@@ -51,7 +51,7 @@ docker-down-clear:
 	if [ "$$CONFIRM" = "YES" ]; then \
 		@printf "\nConfirmation received. Proceeding with data deletion...\n"; \
 		@docker compose down -v --remove-orphans; \
-		@printf "✓%b All services and associated volumes have been successfully removed.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"; \
+		@printf "%b✓ All services and associated volumes have been successfully removed.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"; \
 	else \
 		@printf "\nConfirmation not received. Operation cancelled.\n"; \
 	fi
@@ -104,9 +104,9 @@ $(CERT_FILE):
 ## (Linux/macOS only) Generates or regenerates TLS certificates.
 generate-certs:
 	@if [ -f "$(CERT_FILE)" ]; then \
-		@printf "✓%b Regenerating existing certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
+		@printf "%b✓ Regenerating existing certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
 	else \
-		@printf "✓%b Generating new certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
+		@printf "%b✓ Generating new certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
 	fi
 	@printf "   IMPORTANT: Make sure you have run 'mkcert -install' once on your machine.\n"
 	@mkdir -p $(CERT_DIR)
@@ -115,14 +115,14 @@ generate-certs:
 
 # -- Finalization --
 success:
-	@printf "\n✓%b Environment is up and running.%b\n\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"
+	@printf "\n%b✓ Environment is up and running.%b\n\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"
 
 ## Displays useful project URLs.
 info:
-	@printf "\n%bAccessing Services:%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"
-	@printf " - Traefik:      https://traefik.app.loc\n"
-	@printf " - Buggregator:  https://buggregator.app.loc\n"
-	@printf " - Dozzle:       https://logs.app.loc\n\n"
+	@printf "%b➜ Accessing Services:%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"
+	@printf "   Traefik:      https://traefik.app.loc\n"
+	@printf "   Buggregator:  https://buggregator.app.loc\n"
+	@printf "   Dozzle:       https://logs.app.loc\n\n"
 
 
 ## Displays this help message.
