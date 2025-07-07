@@ -49,11 +49,11 @@ docker-down-clear:
 	@printf "%b   This includes all databases, cached data, etc. This action CANNOT be undone.%b\n\n" "$(COLOR_RED)" "$(COLOR_DEFAULT)"
 	@read -p "Type 'YES' in all caps to confirm: " CONFIRM; \
 	if [ "$$CONFIRM" = "YES" ]; then \
-		@printf "\nConfirmation received. Proceeding with data deletion...\n"; \
-		@docker compose down -v --remove-orphans; \
-		@printf "%b✓ All services and associated volumes have been successfully removed.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"; \
+		printf "\nConfirmation received. Proceeding with data deletion...\n"; \
+		docker compose down -v --remove-orphans; \
+		printf "%b✓ All services and associated volumes have been successfully removed.%b\n" "$(COLOR_GREEN)" "$(COLOR_DEFAULT)"; \
 	else \
-		@printf "\nConfirmation not received. Operation cancelled.\n"; \
+		printf "\nConfirmation not received. Operation cancelled.\n"; \
 	fi
 
 
@@ -104,9 +104,9 @@ $(CERT_FILE):
 ## (Linux/macOS only) Generates or regenerates TLS certificates.
 generate-certs:
 	@if [ -f "$(CERT_FILE)" ]; then \
-		@printf "%b✓ Regenerating existing certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
+		printf "%b✓ Regenerating existing certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
 	else \
-		@printf "%b✓ Generating new certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
+		printf "%b✓ Generating new certificates...%b\n" "$(COLOR_YELLOW)" "$(COLOR_DEFAULT)"; \
 	fi
 	@printf "   IMPORTANT: Make sure you have run 'mkcert -install' once on your machine.\n"
 	@mkdir -p $(CERT_DIR)
